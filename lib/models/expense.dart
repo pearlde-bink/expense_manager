@@ -14,6 +14,11 @@ class Expense {
     required this.tag,
   });
 
+  @override
+  String toString() {
+    return 'Expense(id: $id, amount: $amount, categoryId: $categoryId, payee: $payee, note: $note, date: $date, tag: $tag)';
+  }
+
   factory Expense.fromJson(Map<String, dynamic> json) {
     return Expense(
         id: json['id'],

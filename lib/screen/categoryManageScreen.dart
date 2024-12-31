@@ -41,40 +41,4 @@ class CategoryManageScreen extends StatelessWidget {
           child: const Icon(Icons.add),
         ));
   }
-
-  // void _showAddCategoryDialog(BuildContext context) {
-  //   final TextEditingController _categoryNameController =
-  //       TextEditingController();
-  //   showDialog(
-  //       context: context,
-  //       builder: (context) {
-  //         return AlertDialog(
-  //             title: const Text('Add Category'),
-  //             content: TextField(
-  //               controller: _categoryNameController,
-  //               decoration: const InputDecoration(labelText: 'Category name'),
-  //             ),
-  //             actions: <Widget>[
-  //               TextButton(
-  //                 onPressed: () {
-  //                   Navigator.pop(context);
-  //                 },
-  //                 child: const Text('Cancel'),
-  //               ),
-  //               TextButton(
-  //                 onPressed: () {
-  //                   final category = Category(
-  //                     id: DateTime.now().millisecondsSinceEpoch.toString(),
-  //                     name: _categoryNameController.text,
-  //                     isDefault: false,
-  //                   );
-  //                   Provider.of<ExpenseProvider>(context, listen: false)
-  //                       .addCategory(category);
-  //                   Navigator.pop(context);
-  //                 },
-  //                 child: const Text('Add'),
-  //               )
-  //             ]);
-  //       });
-  // }
 }

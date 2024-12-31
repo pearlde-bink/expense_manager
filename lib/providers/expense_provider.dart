@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
-// import 'dart:convert';
+// import 'package:intl/intl.dart';
+import 'dart:convert';
 import '../models/expense.dart';
 import '../models/category.dart';
 import '../models/tag.dart';
+import '../models/payee.dart';
+import '../models/date.dart';
 
 class ExpenseProvider with ChangeNotifier {
   final LocalStorage storage;
   List<Expense> _expenses = [];
+  List<Payee> _payees = [];
+  List<DateExpense> _dates = [];
 
   final List<Category> _categories = [
-    Category(id: '1', name: 'Food', isDefault: true),
-    Category(id: '2', name: 'Transport', isDefault: true),
-    Category(id: '3', name: 'Shopping', isDefault: true),
+    Category(id: '1', name: 'Entertainment', isDefault: true),
+    Category(id: '2', name: 'Education', isDefault: true),
+    Category(id: '3', name: 'Food', isDefault: true),
     Category(id: '4', name: 'Health', isDefault: true),
-    Category(id: '5', name: 'Entertainment', isDefault: true),
-    Category(id: '6', name: 'Education', isDefault: true),
-    Category(id: '7', name: 'Office', isDefault: true),
+    Category(id: '5', name: 'Office', isDefault: true),
+    Category(id: '6', name: 'Shopping', isDefault: true),
+    Category(id: '7', name: 'Transport', isDefault: true),
   ];
 
   // List of tags
@@ -41,18 +46,16 @@ class ExpenseProvider with ChangeNotifier {
   List<Expense> get expenses => _expenses;
   List<Category> get categories => _categories;
   List<Tag> get tags => _tags;
+  List<Payee> get payees => _payees;
+  List<DateExpense> get dates => _dates;
 
   ExpenseProvider(this.storage) {
     _loadExpensesFromStorage();
   }
 
   void _loadExpensesFromStorage() async {
-    // bool isReady = await storage.ready;
-    // if (isReady) {
-
-    WidgetsFlutterBinding.ensureInitialized();
-    await initLocalStorage();
-
+    // WidgetsFlutterBinding.ensureInitialized();
+    // await initLocalStorage();
     var storedExpenses = storage.getItem('expenses');
 
     if (storedExpenses != null) {
@@ -64,15 +67,66 @@ class ExpenseProvider with ChangeNotifier {
     // }
   }
 
+  // void _loadDatesFromStorage() {
+  //   var savedDates = storage.getItem('dates');
+  //   if (savedDates != null) {
+  //     _dates = (jsonDecode(savedDates) as List<dynamic>).map((date) {
+  //       var parts = date.split('-');
+  //       return DateExpense(
+  //         id: UniqueKey().toString(),
+  //         year: int.parse(parts[0]),
+  //         month: int.parse(parts[1]),
+  //         day: int.parse(parts[2]),
+  //       );
+  //     }).toList();
+  //   }
+  // }
+
   void _saveExpenseToStorage() {
     // storage.setItem('expenses', _expenses.map((e) => e.toJson()).toList());
-    storage.setItem('expenses', _expenses.map((e) => e.toJson()).toString());
+    storage.setItem(
+        'expenses', jsonEncode(_expenses.map((e) => e.toJson()).toList()));
+  }
+
+  void _savePayeeToStorage() {
+    storage.setItem(
+        'payees', jsonEncode(_payees.map((e) => e.toString()).toList()));
+  }
+
+  void _saveDatesToStorage() {
+    // storage.setItem(
+    //     'dates',
+    //     jsonEncode(_dates
+    //         .map((e) => DateFormat('yyyy-MM-dd').format(e.toDateTime()))
+    //         .toList()));
+    storage.setItem(
+      'dates',
+      jsonEncode(_dates
+          .map((e) => e.toString())
+          .toList()), // Use toString() for consistent format
+    );
   }
 
   void addExpense(Expense expense) {
     _expenses.add(expense);
     _saveExpenseToStorage();
     notifyListeners();
+  }
+
+  void addPayee(Payee payee) {
+    if (!_payees.any((p) => p == payee)) {
+      _payees.add(payee);
+      _savePayeeToStorage();
+      notifyListeners();
+    }
+  }
+
+  void addDate(DateExpense date) {
+    if (!_dates.any((d) => d == date)) {
+      _dates.add(date);
+      _saveDatesToStorage();
+      notifyListeners();
+    }
   }
 
   void addCategory(Category category) {
@@ -93,6 +147,7 @@ class ExpenseProvider with ChangeNotifier {
     int index = _expenses.indexWhere((e) => e.id == expense.id);
 
     if (index != 1) {
+      // Update existing expense
       _expenses[index] = expense;
     } else {
       _expenses.add(expense);

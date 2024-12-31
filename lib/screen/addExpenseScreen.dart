@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/expense.dart';
+import '../models/payee.dart';
+import '../models/date.dart';
 import '../providers/expense_provider.dart';
 import '../dialog/addCategoryDialog.dart';
 import '../dialog/addTagDialog.dart';
+import 'package:logger/logger.dart';
+
+var logger = Logger();
 
 class AddExpenseScreen extends StatefulWidget {
   final Expense? initialExpense;
@@ -21,7 +26,8 @@ class _AddCategoryDialogState extends State<AddExpenseScreen> {
   late TextEditingController _noteController;
   String? _selectedCategoryId;
   String? _selectedTagId;
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
   @override
   void initState() {
@@ -32,7 +38,9 @@ class _AddCategoryDialogState extends State<AddExpenseScreen> {
         TextEditingController(text: widget.initialExpense?.payee ?? '');
     _noteController =
         TextEditingController(text: widget.initialExpense?.note ?? '');
-    _selectedDate = widget.initialExpense?.date ?? DateTime.now();
+    _selectedDate = widget.initialExpense?.date ??
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    ;
     _selectedCategoryId = widget.initialExpense?.categoryId;
     _selectedTagId = widget.initialExpense?.tag;
   }
@@ -110,7 +118,7 @@ class _AddCategoryDialogState extends State<AddExpenseScreen> {
   }
 
   Widget buildCategoryDropdown(ExpenseProvider expenseProvider) {
-    return DropdownButtonFormField(
+    return DropdownButtonFormField<String>(
         value: _selectedCategoryId,
         onChanged: (newValue) {
           if (newValue == "New") {
@@ -143,7 +151,7 @@ class _AddCategoryDialogState extends State<AddExpenseScreen> {
   }
 
   Widget buildTagDropdown(ExpenseProvider expenseProvider) {
-    return DropdownButtonFormField(
+    return DropdownButtonFormField<String>(
         value: _selectedTagId,
         onChanged: (newValue) {
           if (newValue == "New") {
@@ -173,9 +181,15 @@ class _AddCategoryDialogState extends State<AddExpenseScreen> {
   }
 
   void _saveExpense() {
-    if (_amountController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please fill in all fields!")));
+    if (_amountController.text.isEmpty ||
+        _selectedCategoryId == null ||
+        _selectedTagId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+            "Please fill in all fields!",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red));
       return;
     }
 
@@ -184,25 +198,39 @@ class _AddCategoryDialogState extends State<AddExpenseScreen> {
           DateTime.now().millisecondsSinceEpoch.toString(),
       amount: double.parse(_amountController.text),
       categoryId: _selectedCategoryId!,
-      date: _selectedDate,
-      note: _noteController.text,
       payee: _payeeController.text,
+      note: _noteController.text,
+      date: _selectedDate,
       tag: _selectedTagId!,
     );
 
-    Provider.of<ExpenseProvider>(context, listen: false)
-        .addOrUpdateExpense(expense);
-    Navigator.of(context).pop();
-    // Navigator.pop(context);
+    final payee = Payee(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: expense.payee);
+
+    final date = DateExpense(
+      id: expense.date.toString(),
+      year: expense.date.year,
+      month: expense.date.month,
+      day: expense.date.day,
+    );
+
+    logger.d("Expense: $expense");
+
+    Provider.of<ExpenseProvider>(context, listen: false).addExpense(expense);
+    Provider.of<ExpenseProvider>(context, listen: false).addPayee(payee);
+    Provider.of<ExpenseProvider>(context, listen: false).addDate(date);
+    // Navigator.of(context).pop();
+    Navigator.pop(context);
   }
 
-  void dispose() {
-    _amountController.dispose();
-    // _selectedCategoryId!.dispose();
-    // _selectedDate.dispose();
-    // _selectedTagId.dispose();
-    _noteController.dispose();
-    _payeeController.dispose();
-    super.dispose();
-  }
+  // void dispose() {
+  //   _amountController.dispose();
+  //   // _selectedCategoryId!.dispose();
+  //   // _selectedDate.dispose();
+  //   // _selectedTagId.dispose();
+  //   _noteController.dispose();
+  //   _payeeController.dispose();
+  //   super.dispose();
+  // }
 }

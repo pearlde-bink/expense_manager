@@ -29,12 +29,6 @@ class _TagDialogState extends State<AddTagDialog> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            // onPressed: () {
-            //   final nameTag = _nameController.text;
-            //   if (nameTag.isNotEmpty) {
-            //     Navigator.of(context).pop();
-            //   }
-            // },
             onPressed: () {
               var newTag = Tag(
                   id: DateTime.now().toIso8601String(),

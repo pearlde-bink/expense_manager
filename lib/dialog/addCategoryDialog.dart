@@ -30,10 +30,6 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
           ),
           ElevatedButton(
             onPressed: () {
-              // final nameCategory = _nameController.text;
-              // if (nameCategory.isNotEmpty) {
-              //   Navigator.of(context).pop(nameCategory);
-              // }
               var newCategory = Category(
                   id: DateTime.now().toString(), name: _nameController.text);
               widget.onAdd(newCategory);

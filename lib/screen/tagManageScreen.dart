@@ -47,38 +47,4 @@ class TagManageScreen extends StatelessWidget {
       ),
     );
   }
-
-  // void _showAddTagDialog(BuildContext context) {
-  //   final TextEditingController _tagNameController = TextEditingController();
-
-  //   showDialog(
-  //       context: context,
-  //       builder: (context) {
-  //         return AlertDialog(
-  //             title: const Text('Add Tag'),
-  //             content: TextField(
-  //               controller: _tagNameController,
-  //               decoration: const InputDecoration(labelText: "Tag name"),
-  //             ),
-  //             actions: <Widget>[
-  //               TextButton(
-  //                 onPressed: () {
-  //                   Navigator.pop(context);
-  //                 },
-  //                 child: const Text('Cancel'),
-  //               ),
-  //               TextButton(
-  //                 onPressed: () {
-  //                   final tag = Tag(
-  //                       id: DateTime.now().millisecondsSinceEpoch.toString(),
-  //                       name: _tagNameController.text);
-  //                   Provider.of<ExpenseProvider>(context, listen: false)
-  //                       .addTag(tag);
-  //                   Navigator.pop(context);
-  //                 },
-  //                 child: const Text("Add"),
-  //               ),
-  //             ]);
-  //       });
-  // }
 }
